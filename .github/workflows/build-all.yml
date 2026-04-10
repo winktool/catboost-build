@@ -31,6 +31,16 @@ jobs:
     env:
       CMAKE_BUILD_CACHE_DIR: cmake_build_cache
     steps:
+      - name: Remove unneeded packages and tools cache
+        run: |
+          sudo apt-get remove -y '^llvm-.*' 'php.*' '^mongodb-.*' '^mysql-.*' \
+            azure-cli google-chrome-stable firefox mono-devel libgl1-mesa-dri \
+            google-cloud-sdk google-cloud-cli '^gfortran-.*' java-common \
+            '^r-.*' '^lib.*-dev' --fix-missing || true
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
@@ -175,6 +185,16 @@ jobs:
     env:
       CMAKE_BUILD_CACHE_DIR: cmake_build_cache
     steps:
+      - name: Remove unneeded packages and tools cache
+        run: |
+          sudo apt-get remove -y '^llvm-.*' 'php.*' '^mongodb-.*' '^mysql-.*' \
+            azure-cli google-chrome-stable firefox mono-devel libgl1-mesa-dri \
+            google-cloud-sdk google-cloud-cli '^gfortran-.*' java-common \
+            '^r-.*' '^lib.*-dev' --fix-missing || true
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
         with:
