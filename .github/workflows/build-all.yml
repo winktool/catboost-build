@@ -286,11 +286,69 @@ jobs:
           retention-days: ${{ inputs.artifact_retention_days }}
 
   # ============================================================
+  # macOS: Prepare ARM64 Python environments (前置步骤)
+  # ============================================================
+  prepare-macos-arm64-python:
+    if: contains(inputs.platforms, 'macos') || inputs.platforms == 'all'
+    name: Prepare macOS ARM64 Python
+    runs-on: macos-14
+    timeout-minutes: 60
+    steps:
+      - name: Check cache
+        id: cache-check
+        uses: actions/cache/restore@v4
+        with:
+          enableCrossOsArchive: true
+          path: python_versions_macos_arm64.zip
+          key: python_versions_macos_arm64-v1
+          lookup-only: true
+
+      - name: Install pyenv and build Python versions
+        if: steps.cache-check.outputs.cache-hit != 'true'
+        run: |
+          brew install pyenv
+
+          pyenv install 3.8.18
+          cd $HOME/.pyenv/versions/ && ln -s 3.8.18 ./3.8
+          pyenv install 3.9.19
+          cd $HOME/.pyenv/versions/ && ln -s 3.9.19 ./3.9
+          pyenv install 3.10.14
+          cd $HOME/.pyenv/versions/ && ln -s 3.10.14 ./3.10
+          pyenv install 3.11.9
+          cd $HOME/.pyenv/versions/ && ln -s 3.11.9 ./3.11
+          pyenv install 3.12.3
+          cd $HOME/.pyenv/versions/ && ln -s 3.12.3 ./3.12
+          pyenv install 3.13.1
+          cd $HOME/.pyenv/versions/ && ln -s 3.13.1 ./3.13
+
+          export PYENV_ROOT="$HOME/.pyenv"
+          command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+          eval "$(pyenv init --path)"
+          eval "$(pyenv init -)"
+
+          for PY_VER in 3.8 3.9 3.10 3.11 3.12 3.13
+          do
+              pyenv shell $PY_VER
+              python -m pip install -U pip numpy
+          done
+
+          cd $HOME/.pyenv/versions/ && zip -r -y ${{ github.workspace }}/python_versions_macos_arm64.zip *
+
+      - name: Save to cache
+        if: steps.cache-check.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          enableCrossOsArchive: true
+          path: python_versions_macos_arm64.zip
+          key: python_versions_macos_arm64-v1
+
+  # ============================================================
   # macOS universal2 Build
   # ============================================================
   build-macos:
     if: contains(inputs.platforms, 'macos') || inputs.platforms == 'all'
     name: Build macOS universal2
+    needs: [prepare-macos-arm64-python]
     runs-on: macos-13
     timeout-minutes: 360
     steps:
@@ -304,6 +362,14 @@ jobs:
             3.11
             3.12
             3.13
+
+      - name: Restore ARM64 Python from cache
+        uses: actions/cache/restore@v4
+        with:
+          enableCrossOsArchive: true
+          fail-on-cache-miss: true
+          path: python_versions_macos_arm64.zip
+          key: python_versions_macos_arm64-v1
 
       - name: Checkout CatBoost
         uses: actions/checkout@v4
@@ -326,13 +392,13 @@ jobs:
 
           mkdir -p $CMAKE_BUILD_ENV_ROOT/darwin-x86_64
 
-          # JDK
+          # JDK x86_64
           cd $CMAKE_BUILD_ENV_ROOT/darwin-x86_64
           mkdir -p Library/Java/JavaVirtualMachines
           cd Library/Java/JavaVirtualMachines
           ln -s /Library/Java/JavaVirtualMachines/Temurin-Hotspot-8.jdk ./jdk-8 || true
 
-          # Python
+          # Python x86_64
           cd $CMAKE_BUILD_ENV_ROOT/darwin-x86_64
           mkdir -p Python
           cd Python
@@ -346,8 +412,10 @@ jobs:
             fi
           done
 
-          # arm64 setup - download ARM64 Python versions
+          # ARM64 setup
           mkdir -p $CMAKE_BUILD_ENV_ROOT/darwin-arm64
+
+          # JDK arm64
           cd $CMAKE_BUILD_ENV_ROOT/darwin-arm64
           mkdir -p Library/Java/JavaVirtualMachines
           cd Library/Java/JavaVirtualMachines
@@ -356,6 +424,12 @@ jobs:
             tar xzf zulu8.78.0.19-ca-jdk8.0.412-macosx_aarch64.tar.gz
             ln -sf ./zulu8.78.0.19-ca-jdk8.0.412-macosx_aarch64/zulu-8.jdk ./jdk-8
           fi
+
+          # Python arm64 (from cache)
+          cd $CMAKE_BUILD_ENV_ROOT/darwin-arm64
+          mkdir -p Python
+          cd Python
+          unzip ${{ github.workspace }}/python_versions_macos_arm64
 
       - name: Build
         run: |
