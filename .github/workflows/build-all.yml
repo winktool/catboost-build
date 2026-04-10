@@ -83,12 +83,20 @@ jobs:
           path: catboost/build_native_root/have_cuda/linux-x86_64/catboost/app/catboost
           retention-days: ${{ inputs.artifact_retention_days }}
 
-      # Upload catboostmodel library
+      # Upload catboostmodel library (推理)
       - name: 'Upload: catboostmodel library (linux-x86_64)'
         uses: actions/upload-artifact@v4
         with:
           name: catboost-model-interface-linux-x86_64
           path: catboost/build_native_root/have_cuda/linux-x86_64/catboost/libs/model_interface/libcatboostmodel.*
+          retention-days: ${{ inputs.artifact_retention_days }}
+
+      # Upload catboost train_interface library (训练)
+      - name: 'Upload: libcatboost train library (linux-x86_64)'
+        uses: actions/upload-artifact@v4
+        with:
+          name: catboost-train-interface-linux-x86_64
+          path: catboost/build_native_root/have_cuda/linux-x86_64/catboost/libs/train_interface/libcatboost.*
           retention-days: ${{ inputs.artifact_retention_days }}
 
       # Upload Python wheels
@@ -219,12 +227,20 @@ jobs:
           path: catboost/build_native_root/have_cuda/linux-aarch64/catboost/app/catboost
           retention-days: ${{ inputs.artifact_retention_days }}
 
-      # Upload catboostmodel library
+      # Upload catboostmodel library (推理)
       - name: 'Upload: catboostmodel library (linux-aarch64)'
         uses: actions/upload-artifact@v4
         with:
           name: catboost-model-interface-linux-aarch64
           path: catboost/build_native_root/have_cuda/linux-aarch64/catboost/libs/model_interface/libcatboostmodel.*
+          retention-days: ${{ inputs.artifact_retention_days }}
+
+      # Upload catboost train_interface library (训练)
+      - name: 'Upload: libcatboost train library (linux-aarch64)'
+        uses: actions/upload-artifact@v4
+        with:
+          name: catboost-train-interface-linux-aarch64
+          path: catboost/build_native_root/have_cuda/linux-aarch64/catboost/libs/train_interface/libcatboost.*
           retention-days: ${{ inputs.artifact_retention_days }}
 
       # Upload Python wheels
@@ -358,12 +374,20 @@ jobs:
           path: catboost/build_native_root/no_cuda/darwin-universal2/catboost/app/catboost
           retention-days: ${{ inputs.artifact_retention_days }}
 
-      # Upload catboostmodel library
+      # Upload catboostmodel library (推理)
       - name: 'Upload: catboostmodel library (darwin-universal2)'
         uses: actions/upload-artifact@v4
         with:
           name: catboost-model-interface-darwin-universal2
           path: catboost/build_native_root/no_cuda/darwin-universal2/catboost/libs/model_interface/libcatboostmodel.*
+          retention-days: ${{ inputs.artifact_retention_days }}
+
+      # Upload catboost train_interface library (训练)
+      - name: 'Upload: libcatboost train library (darwin-universal2)'
+        uses: actions/upload-artifact@v4
+        with:
+          name: catboost-train-interface-darwin-universal2
+          path: catboost/build_native_root/no_cuda/darwin-universal2/catboost/libs/train_interface/libcatboost.*
           retention-days: ${{ inputs.artifact_retention_days }}
 
       # Upload Python wheels
@@ -497,7 +521,7 @@ jobs:
           path: catboost/build_native_root/have_cuda/windows-x86_64/catboost/app/catboost.exe
           retention-days: ${{ inputs.artifact_retention_days }}
 
-      # Upload catboostmodel library
+      # Upload catboostmodel library (推理)
       - name: 'Upload: catboostmodel library (windows-x86_64)'
         uses: actions/upload-artifact@v4
         with:
@@ -505,6 +529,16 @@ jobs:
           path: |
             catboost/build_native_root/have_cuda/windows-x86_64/catboost/libs/model_interface/catboostmodel.dll
             catboost/build_native_root/have_cuda/windows-x86_64/catboost/libs/model_interface/catboostmodel.lib
+          retention-days: ${{ inputs.artifact_retention_days }}
+
+      # Upload catboost train_interface library (训练)
+      - name: 'Upload: catboost train library (windows-x86_64)'
+        uses: actions/upload-artifact@v4
+        with:
+          name: catboost-train-interface-windows-x86_64
+          path: |
+            catboost/build_native_root/have_cuda/windows-x86_64/catboost/libs/train_interface/catboost.dll
+            catboost/build_native_root/have_cuda/windows-x86_64/catboost/libs/train_interface/catboost.lib
           retention-days: ${{ inputs.artifact_retention_days }}
 
       # Upload Python wheels

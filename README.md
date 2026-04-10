@@ -16,6 +16,7 @@
 - **catboost CLI** — 命令行训练/推理工具
 - **Python wheels** — 支持 Python 3.8-3.13
 - **catboostmodel 动态库** — C API 推理库 (`.so` / `.dylib` / `.dll`)
+- **libcatboost 训练库** — C API 训练库 (`.so` / `.dylib` / `.dll`)，支持通过 FFI 直接调用 `TrainCatBoost()`
 - **R 包** — `.tgz` 格式
 - **JVM 包** — catboost4j-prediction / catboost4j-spark
 - **测试工具**
